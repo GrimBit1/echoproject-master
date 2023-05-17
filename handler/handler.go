@@ -1,10 +1,15 @@
 package handler
 
-import "github.com/labstack/echo/v4"
+import (
+	"fmt"
 
-var studenthandler studentHandler
+	"github.com/labstack/echo/v4"
+)
+
+var studenthandler = studentHandler{"Student"}
 
 func Api(e *echo.Echo) {
+	fmt.Println(studenthandler,"Hi")
 	studentRouteGroup := e.Group("/students")
 
 	studentRouteGroup.GET("/", studenthandler.getStudents)

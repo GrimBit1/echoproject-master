@@ -41,7 +41,7 @@ func (s studentHandler) createStudent(c echo.Context) error {
 // Route 3 Get Student as per id
 func (s studentHandler) getStudent(c echo.Context) error {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
-	var Student = studentlogic.Filter(studentlogic.Students, id)
+	var Student = studentlogic.Filter(id)
 	if len(Student.Name) != 0 {
 
 		return c.JSON(http.StatusOK, Student)
@@ -60,14 +60,11 @@ func (s studentHandler) updateStudent(c echo.Context) error {
 	// var age = c.FormValue("name")
 	// var rollNo = c.FormValue("name")
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
-	var Student = studentlogic.Filter(studentlogic.Students, id)
+	var Student = studentlogic.Filter(id)
 	if len(Student.Name) != 0 {
 
-		var index int64 = studentlogic.GiveIndex(studentlogic.Students, id)
+		Student = studentlogic.UpdateStudent(Student, name, id)
 
-		Student.Name = name
-		studentlogic.Students[index] = Student
-		// students = remove(students, id)
 		return c.JSON(http.StatusOK, Student)
 	}
 	return c.JSON(http.StatusBadRequest, studentlogic.Error{Message: "Not Allowed"})
@@ -78,10 +75,10 @@ func (s studentHandler) updateStudent(c echo.Context) error {
 
 func (s studentHandler) deleteStudent(c echo.Context) error {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
-	var Student = studentlogic.Filter(studentlogic.Students, id)
+	var Student = studentlogic.Filter(id)
 	if len(Student.Name) != 0 {
 
-		var index int64 = studentlogic.GiveIndex(studentlogic.Students, id)
+		var index int64 = studentlogic.GiveIndex(id)
 		studentlogic.Students = studentlogic.Remove(studentlogic.Students, index)
 		return c.JSON(http.StatusOK, Student)
 	}
