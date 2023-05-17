@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	studentlogic "server/buisness/student"
 	studentmethods "server/handler/student"
 
 	"github.com/labstack/echo/v4"
@@ -17,9 +15,11 @@ func main() {
 	e.Use(middleware.AddTrailingSlash())
 	e.Use(middleware.Logger())
 	// e.Use(middleware.Recover())
-	fmt.Println(studentlogic.Student{})
 	studentRouteGroup := e.Group("/students")
 	// var c  echo.Context
+	e.GET("/", func(c echo.Context) error {
+		return c.String(int(200), "jejejehehe")
+	})
 	studentRouteGroup.GET("/", studentmethods.GetStudents)
 	studentRouteGroup.GET("/:id", studentmethods.GetStudent)
 	studentRouteGroup.POST("/", studentmethods.CreateStudent)

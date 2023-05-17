@@ -11,9 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type Error struct {
-	Message string `json:"message"`
-}
+var httpImaTeapot int = 418
 
 // Route 1 Get Student as per id
 
@@ -34,7 +32,7 @@ func CreateStudent(c echo.Context) error {
 		studentlogic.AddStudent(newStudent)
 		return c.JSON(http.StatusOK, newStudent)
 	}
-	return c.JSON(http.StatusBadRequest, Error{"Invalid Format"})
+	return c.JSON(http.StatusBadRequest, studentlogic.Error{"Invalid Format"})
 }
 
 // Route 3 Get Student as per id
@@ -45,7 +43,7 @@ func GetStudent(c echo.Context) error {
 
 		return c.JSON(http.StatusOK, Student)
 	}
-	return c.JSON(http.StatusNotFound, Error{"Not Found"})
+	return c.JSON(http.StatusNotFound, studentlogic.Error{"Not Found"})
 
 }
 
@@ -53,6 +51,9 @@ func GetStudent(c echo.Context) error {
 
 func UpdateStudent(c echo.Context) error {
 	var name = c.FormValue("name")
+	if len(name) == 0 {
+		return c.JSON(httpImaTeapot, studentlogic.Error{"Name must be valid"})
+	}
 	// var age = c.FormValue("name")
 	// var rollNo = c.FormValue("name")
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
@@ -67,7 +68,7 @@ func UpdateStudent(c echo.Context) error {
 		// students = remove(students, id)
 		return c.JSON(http.StatusOK, Student)
 	}
-	return c.JSON(http.StatusBadRequest, Error{"Not Allowed"})
+	return c.JSON(http.StatusBadRequest, studentlogic.Error{"Not Allowed"})
 
 }
 
@@ -84,6 +85,6 @@ func DeleteStudent(c echo.Context) error {
 		studentlogic.Students = studentlogic.Remove(studentlogic.Students, index)
 		return c.JSON(http.StatusOK, Student)
 	}
-	return c.JSON(http.StatusBadRequest, Error{"Invalid Format"})
+	return c.JSON(http.StatusBadRequest, studentlogic.Error{"Bad Request"})
 
 }

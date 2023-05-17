@@ -1,13 +1,6 @@
 package studentlogic
 
-type Student struct {
-	Name   string `json:"name"`
-	Age    int64  `json:"age"`
-	Rollno int64  `json:"rollno"`
-	Index  int64  `json:"index"`
-}
-
-var Index int64 = 0
+var Index int64 = 1
 var IndexPointer = &Index
 var Students = []Student{}
 
