@@ -36,11 +36,9 @@ func UpdateStudent(oldStudent Student, updatedStudent Student, id int64) Student
 	if updatedStudent.Rollno == 0 {
 		updatedStudent.Rollno = oldStudent.Rollno
 	}
-
 	if len(updatedStudent.Name) == 0 {
 		updatedStudent.Name = oldStudent.Name
 	}
-	
 
 	var index int64 = GiveIndex(id)
 

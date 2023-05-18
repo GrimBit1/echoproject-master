@@ -109,7 +109,7 @@ func (s studentHandler) updateStudent(c echo.Context) error {
 	// if no errors then update student
 	var updatedStudent = studentlogic.Student{Name: name, Age: age, Rollno: rollno, Index: id} // create a template of the Student struct with values
 
-	var Student = studentlogic.UpdateStudent(oldstudent,updatedStudent, id) // send to updateStudent function
+	var Student = studentlogic.UpdateStudent(oldstudent, updatedStudent, id) // send to updateStudent function
 
 	return c.JSON(http.StatusOK, Student)
 
