@@ -28,10 +28,22 @@ func AddStudent(_students Student) {
 func Remove(s []Student, i int64) []Student {
 	return append(Students[:i], Students[i+1:]...)
 }
-func UpdateStudent(student Student, name string, id int64) Student {
+func UpdateStudent(oldStudent Student, updatedStudent Student, id int64) Student {
+	// If the default values are provided then don't change it
+	if updatedStudent.Age == 0 {
+		updatedStudent.Age = oldStudent.Age
+	}
+	if updatedStudent.Rollno == 0 {
+		updatedStudent.Rollno = oldStudent.Rollno
+	}
+
+	if len(updatedStudent.Name) == 0 {
+		updatedStudent.Name = oldStudent.Name
+	}
+	
+
 	var index int64 = GiveIndex(id)
 
-	student.Name = name
-	Students[index] = student
-	return student
+	Students[index] = updatedStudent
+	return updatedStudent
 }
