@@ -20,7 +20,8 @@ var httpImaTeapot int = 418
 // Route 1 Get Student as per id
 
 func (s studentHandler) getStudents(c echo.Context) error {
-	return c.JSON(http.StatusOK, studentlogic.Students)
+
+	return c.JSON(http.StatusOK, studentlogic.GiveStudents())
 }
 
 // Route 2 Get Student as per id
@@ -43,8 +44,7 @@ func (s studentHandler) createStudent(c echo.Context) error {
 	// if no error then add student
 	if len(name) != 0 {
 
-		var newStudent = studentlogic.Student{Name: name, Age: age, Rollno: rollno, Index: studentlogic.Index}
-		*studentlogic.IndexPointer++
+		var newStudent = studentlogic.Student{Name: name, Age: age, Rollno: rollno}
 		studentlogic.AddStudent(newStudent)
 		return c.JSON(http.StatusOK, newStudent)
 	}
@@ -107,7 +107,7 @@ func (s studentHandler) updateStudent(c echo.Context) error {
 	}
 
 	// if no errors then update student
-	var updatedStudent = studentlogic.Student{Name: name, Age: age, Rollno: rollno, Index: id} // create a template of the Student struct with values
+	var updatedStudent = studentlogic.Student{Name: name, Age: age, Rollno: rollno} // create a template of the Student struct with values
 
 	var Student = studentlogic.UpdateStudent(oldstudent, updatedStudent, id) // send to updateStudent function
 
@@ -122,8 +122,8 @@ func (s studentHandler) deleteStudent(c echo.Context) error {
 	var Student = studentlogic.Filter(id)
 	if len(Student.Name) != 0 {
 
-		var index int64 = studentlogic.GiveIndex(id)
-		studentlogic.Students = studentlogic.Remove(studentlogic.Students, index)
+		var index = id
+		studentlogic.Remove(index)
 		return c.JSON(http.StatusOK, Student)
 	}
 	return c.JSON(http.StatusBadRequest, studentlogic.Error{Message: "Bad Request"})

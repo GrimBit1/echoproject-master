@@ -1,32 +1,58 @@
 package studentlogic
 
-var Index int64 = 1
-var IndexPointer = &Index
+import (
+	"fmt"
+	checkerror "server/checkError"
+)
+
 var Students = []Student{}
 
+func GiveStudents() []Student {
+	var tempArray = []Student{}
+	tempArr, err := GiveDB().Query("Select * from users")
+	// tempArr.Scan()
+	checkerror.Checkerror(err)
+	fmt.Println(tempArr)
+	for tempArr.Next() {
+		var (
+			id     int64
+			name   string
+			age    int64
+			rollno int64
+		)
+		checkerror.Checkerror(tempArr.Scan(&id, &name, &age, &rollno))
+		var student = Student{id,name, age, rollno}
+		tempArray = append(tempArray, student)
+	}
+	Students = tempArray
+	checkerror.Checkerror(tempArr.Err())
+	return Students
+}
+
 func Filter(index int64) Student {
-	for i := range Students {
-		if Students[i].Index == index {
-			return Students[i]
-		}
-	}
-	return Student{}
+	result := GiveDB().QueryRow("Select * from users where id = $1", index)
+	var (
+		id     int64
+		name   string
+		age    int64
+		rollno int64
+	)
+	result.Scan(&id, &name, &age, &rollno)
+	fmt.Println(result)
+
+	student := Student{id,name, age, rollno}
+	return student
 }
-func GiveIndex(index int64) int64 {
-	var j int64 = 0
-	for i := range Students {
-		if Students[i].Index == index {
-			return j
-		}
-		j++
-	}
-	return j
-}
+
 func AddStudent(_students Student) {
-	Students = append(Students, _students)
+	result, err := GiveDB().Exec(`INSERT INTO users(name,age,rollno) VALUES($1,$2,$3)`, _students.Name, _students.Age, _students.Rollno)
+	checkerror.Checkerror(err)
+	fmt.Println(result)
 }
-func Remove(s []Student, i int64) []Student {
-	return append(Students[:i], Students[i+1:]...)
+func Remove(i int64) {
+	_, err := db.Exec("DELETE FROM users WHERE id = $1", i)
+	checkerror.Checkerror(err)
+
 }
 func UpdateStudent(oldStudent Student, updatedStudent Student, id int64) Student {
 	// If the default values are provided then don't change it
@@ -40,8 +66,7 @@ func UpdateStudent(oldStudent Student, updatedStudent Student, id int64) Student
 		updatedStudent.Name = oldStudent.Name
 	}
 
-	var index int64 = GiveIndex(id)
-
-	Students[index] = updatedStudent
+	GiveDB().Exec("update set name = $1 ,age =$2 ,rollno = $3 where id = $4", updatedStudent.Name, updatedStudent.Age, updatedStudent.Rollno, id)
+	GiveStudents()
 	return updatedStudent
 }
