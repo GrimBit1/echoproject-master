@@ -1,7 +1,7 @@
 package main
 
 import (
-	studentlogic "server/buisness/student"
+	"server/connectdb"
 	"server/handler"
 
 	"github.com/labstack/echo/v4"
@@ -20,7 +20,7 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(int(200), "jejejehehe")
 	})
-	studentlogic.ConnectDB()
+	connectdb.ConnectDB()
 	handler.Api(e)
 	e.Logger.Fatal(e.Start(":8000"))
 }

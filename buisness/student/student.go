@@ -1,15 +1,18 @@
 package studentlogic
 
 import (
+	"context"
 	"fmt"
 	checkerror "server/checkError"
+	"server/connectdb"
 )
 
+var ctx context.Context
 var Students = []Student{}
 
 func GiveStudents() []Student {
 	var tempArray = []Student{}
-	tempArr, err := GiveDB().Query("Select * from users")
+	tempArr, err := connectdb.GiveDB().Query("Select * from users")
 	// tempArr.Scan()
 	checkerror.Checkerror(err)
 	fmt.Println(tempArr)
@@ -21,7 +24,7 @@ func GiveStudents() []Student {
 			rollno int64
 		)
 		checkerror.Checkerror(tempArr.Scan(&id, &name, &age, &rollno))
-		var student = Student{id,name, age, rollno}
+		var student = Student{id, name, age, rollno}
 		tempArray = append(tempArray, student)
 	}
 	Students = tempArray
@@ -30,7 +33,7 @@ func GiveStudents() []Student {
 }
 
 func Filter(index int64) Student {
-	result := GiveDB().QueryRow("Select * from users where id = $1", index)
+	result := connectdb.GiveDB().QueryRow("Select * from users where id = $1", index)
 	var (
 		id     int64
 		name   string
@@ -40,17 +43,31 @@ func Filter(index int64) Student {
 	result.Scan(&id, &name, &age, &rollno)
 	fmt.Println(result)
 
-	student := Student{id,name, age, rollno}
+	student := Student{id, name, age, rollno}
 	return student
 }
 
-func AddStudent(_students Student) {
-	result, err := GiveDB().Exec(`INSERT INTO users(name,age,rollno) VALUES($1,$2,$3)`, _students.Name, _students.Age, _students.Rollno)
+func AddStudent(_students Student) int64 {
+	result, err := connectdb.GiveDB().Exec(`INSERT INTO users(name,age,rollno) VALUES($1,$2,$3)`, _students.Name, _students.Age, _students.Rollno)
+
 	checkerror.Checkerror(err)
-	fmt.Println(result)
+
+	var rowChanged, err1 = result.RowsAffected()
+
+	checkerror.Checkerror(err1)
+
+
+	if rowChanged > 0 {
+		res := connectdb.GiveDB().QueryRow(`Select last_value from users_id_seq`)
+		var id int64
+		res.Scan(&id)
+		// fmt.Println(`Student = `, Student{id, name, age, rollno})
+		return id
+	}
+	return 0
 }
 func Remove(i int64) {
-	_, err := db.Exec("DELETE FROM users WHERE id = $1", i)
+	_, err := connectdb.GiveDB().Exec("DELETE FROM users WHERE id = $1", i)
 	checkerror.Checkerror(err)
 
 }
@@ -66,7 +83,7 @@ func UpdateStudent(oldStudent Student, updatedStudent Student, id int64) Student
 		updatedStudent.Name = oldStudent.Name
 	}
 
-	GiveDB().Exec("update set name = $1 ,age =$2 ,rollno = $3 where id = $4", updatedStudent.Name, updatedStudent.Age, updatedStudent.Rollno, id)
+	connectdb.GiveDB().Exec("update users set name = $1 ,age =$2 ,rollno = $3 where id = $4", updatedStudent.Name, updatedStudent.Age, updatedStudent.Rollno, id)
 	GiveStudents()
 	return updatedStudent
 }

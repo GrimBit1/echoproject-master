@@ -17,14 +17,14 @@ type studentHandler struct {
 
 var httpImaTeapot int = 418
 
-// Route 1 Get Student as per id
+// Route 1 Get Students
 
 func (s studentHandler) getStudents(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, studentlogic.GiveStudents())
 }
 
-// Route 2 Get Student as per id
+// Route 2 Create Student
 
 func (s studentHandler) createStudent(c echo.Context) error {
 
@@ -45,7 +45,10 @@ func (s studentHandler) createStudent(c echo.Context) error {
 	if len(name) != 0 {
 
 		var newStudent = studentlogic.Student{Name: name, Age: age, Rollno: rollno}
-		studentlogic.AddStudent(newStudent)
+		newStudent.Id = studentlogic.AddStudent(newStudent)
+		if newStudent.Id == 0 {
+			return c.JSON(http.StatusInternalServerError, studentlogic.Error{Message: "Cannot create user"})
+		}
 		return c.JSON(http.StatusOK, newStudent)
 	}
 	return c.JSON(http.StatusBadRequest, studentlogic.Error{Message: "Invalid Format"})
@@ -66,7 +69,7 @@ func (s studentHandler) getStudent(c echo.Context) error {
 
 }
 
-// Route 4 Get Student as per id
+// Route 4 Update Student as per id
 
 func (s studentHandler) updateStudent(c echo.Context) error {
 	// Already intializing the variables
@@ -107,7 +110,7 @@ func (s studentHandler) updateStudent(c echo.Context) error {
 	}
 
 	// if no errors then update student
-	var updatedStudent = studentlogic.Student{Name: name, Age: age, Rollno: rollno} // create a template of the Student struct with values
+	var updatedStudent = studentlogic.Student{Id: id, Name: name, Age: age, Rollno: rollno} // create a template of the Student struct with values
 
 	var Student = studentlogic.UpdateStudent(oldstudent, updatedStudent, id) // send to updateStudent function
 
@@ -115,7 +118,7 @@ func (s studentHandler) updateStudent(c echo.Context) error {
 
 }
 
-// Route 5 Get Student as per id
+// Route 5 Delete Student as per id
 
 func (s studentHandler) deleteStudent(c echo.Context) error {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
